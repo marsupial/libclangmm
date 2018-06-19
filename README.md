@@ -1,4 +1,4 @@
-# libclangmm [![Build Status](https://travis-ci.org/cppit/libclangmm.svg?branch=master)](https://travis-ci.org/cppit/libclangmm) [![Build status](https://ci.appveyor.com/api/projects/status/bqcva8fovxu31yp3/branch/master?svg=true)](https://ci.appveyor.com/project/zalox/libclangmm/branch/master)
+# libclangmm
 
 ###### an easy-to-use C++ wrapper for libclang
 
