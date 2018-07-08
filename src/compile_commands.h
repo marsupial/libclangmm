@@ -15,5 +15,5 @@ namespace clangmm {
 
     CXCompileCommands cx_commands;
   };
-}
-#endif  // COMPILECOMMANDS_H_
+} // namespace clangmm
+#endif // COMPILECOMMANDS_H_

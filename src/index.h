@@ -9,5 +9,5 @@ namespace clangmm {
     ~Index();
     CXIndex cx_index;
   };
-}  // namespace clangmm
-#endif  // INDEX_H_
+} // namespace clangmm
+#endif // INDEX_H_

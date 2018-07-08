@@ -1,13 +1,13 @@
 #ifndef COMPLETIONSTRING_H_
 #define COMPLETIONSTRING_H_
+#include "cursor.h"
 #include <clang-c/Index.h>
 #include <string>
 #include <vector>
-#include "cursor.h"
 
 namespace clangmm {
   enum CompletionChunkKind {
-    CompletionChunk_Optional,  CompletionChunk_TypedText,
+    CompletionChunk_Optional, CompletionChunk_TypedText,
     CompletionChunk_Text, CompletionChunk_Placeholder,
     CompletionChunk_Informative, CompletionChunk_CurrentParameter,
     CompletionChunk_LeftParen, CompletionChunk_RightParen,
@@ -34,11 +34,11 @@ namespace clangmm {
     std::vector<CompletionChunk> get_chunks() const;
     unsigned get_num_chunks() const;
     std::string get_brief_comment() const;
-    
+
     /// Search for the corresponding cursor
     Cursor get_cursor(CXTranslationUnit &tu) const;
-    
+
     CXCompletionString cx_completion_string;
   };
-}  // namespace clangmm
-#endif  // COMPLETIONSTRING_H_
+} // namespace clangmm
+#endif // COMPLETIONSTRING_H_

@@ -2,22 +2,22 @@
 #include "completion_string.h"
 #include "utility.h"
 
-clangmm::CodeCompleteResults::CodeCompleteResults(CXTranslationUnit &cx_tu, 
-                                                const std::string &buffer,
-                                                unsigned line_num, unsigned column) {
+clangmm::CodeCompleteResults::CodeCompleteResults(CXTranslationUnit &cx_tu,
+                                                  const std::string &buffer,
+                                                  unsigned line_num, unsigned column) {
   CXUnsavedFile files[1];
-  auto file_path=to_string(clang_getTranslationUnitSpelling(cx_tu));
+  auto file_path = to_string(clang_getTranslationUnitSpelling(cx_tu));
   files[0].Filename = file_path.c_str();
   files[0].Contents = buffer.c_str();
   files[0].Length = buffer.size();
 
   cx_results = clang_codeCompleteAt(cx_tu,
-                                  file_path.c_str(),
-                                  line_num,
-                                  column,
-                                  files,
-                                  1,
-                                  clang_defaultCodeCompleteOptions()|CXCodeComplete_IncludeBriefComments);
+                                    file_path.c_str(),
+                                    line_num,
+                                    column,
+                                    files,
+                                    1,
+                                    clang_defaultCodeCompleteOptions() | CXCodeComplete_IncludeBriefComments);
   if(cx_results)
     clang_sortCodeCompletionResults(cx_results->Results, cx_results->NumResults);
 }
@@ -27,11 +27,11 @@ clangmm::CodeCompleteResults::CodeCompleteResults(CodeCompleteResults &&rhs) : c
 }
 
 clangmm::CodeCompleteResults &clangmm::CodeCompleteResults::operator=(CodeCompleteResults &&rhs) {
-  if(this!=&rhs) {
+  if(this != &rhs) {
     if(cx_results)
       clang_disposeCodeCompleteResults(cx_results);
-    cx_results=rhs.cx_results;
-    rhs.cx_results=nullptr;
+    cx_results = rhs.cx_results;
+    rhs.cx_results = nullptr;
   }
   return *this;
 }

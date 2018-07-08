@@ -25,15 +25,14 @@ clangmm::Offset clangmm::SourceLocation::get_offset() const {
   return {line, index};
 }
 
-void clangmm::SourceLocation::get_data(std::string* path, unsigned *line, unsigned *column, unsigned *offset) const {
-  if(path==nullptr)
+void clangmm::SourceLocation::get_data(std::string *path, unsigned *line, unsigned *column, unsigned *offset) const {
+  if(path == nullptr)
     clang_getExpansionLocation(cx_location, NULL, line, column, offset);
   else {
     CXFile file;
     clang_getExpansionLocation(cx_location, &file, line, column, offset);
-    if (file!=NULL) {
-      *path=to_string(clang_getFileName(file));
+    if(file != NULL) {
+      *path = to_string(clang_getFileName(file));
     }
   }
 }
-

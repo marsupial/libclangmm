@@ -25,20 +25,20 @@ clangmm::Token::Kind clangmm::Token::get_kind() const {
 }
 
 bool clangmm::Token::is_identifier() const {
-  auto token_kind=get_kind();
-  auto cursor=get_cursor();
-  if(token_kind==clangmm::Token::Kind::Identifier && cursor.is_valid_kind())
+  auto token_kind = get_kind();
+  auto cursor = get_cursor();
+  if(token_kind == clangmm::Token::Kind::Identifier && cursor.is_valid_kind())
     return true;
-  else if(token_kind==clangmm::Token::Kind::Keyword && cursor.is_valid_kind()) {
-    auto spelling=get_spelling();
-    if(spelling=="operator" || (spelling=="bool" && get_cursor().get_spelling()=="operator bool"))
+  else if(token_kind == clangmm::Token::Kind::Keyword && cursor.is_valid_kind()) {
+    auto spelling = get_spelling();
+    if(spelling == "operator" || (spelling == "bool" && get_cursor().get_spelling() == "operator bool"))
       return true;
   }
-  else if(token_kind==clangmm::Token::Kind::Punctuation && cursor.is_valid_kind()) {
-    auto referenced=cursor.get_referenced();
+  else if(token_kind == clangmm::Token::Kind::Punctuation && cursor.is_valid_kind()) {
+    auto referenced = cursor.get_referenced();
     if(referenced) {
-      auto referenced_kind=referenced.get_kind();
-      if(referenced_kind==Cursor::Kind::FunctionDecl || referenced_kind==Cursor::Kind::CXXMethod || referenced_kind==Cursor::Kind::Constructor)
+      auto referenced_kind = referenced.get_kind();
+      if(referenced_kind == Cursor::Kind::FunctionDecl || referenced_kind == Cursor::Kind::CXXMethod || referenced_kind == Cursor::Kind::Constructor)
         return true;
     }
   }

@@ -5,7 +5,7 @@
 
 namespace clangmm {
   std::string to_string(CXString cx_string);
-  
+
   class String {
   public:
     String(const CXString &cx_string);
@@ -13,8 +13,8 @@ namespace clangmm {
     CXString cx_string;
     const char *c_str;
   };
-  
-  void remove_include_guard(std::string &buffer);
-}
 
-#endif  // UTILITY_H_
+  void remove_include_guard(std::string &buffer);
+} // namespace clangmm
+
+#endif // UTILITY_H_

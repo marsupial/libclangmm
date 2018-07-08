@@ -39,96 +39,96 @@ clangmm::Cursor clangmm::CompletionString::get_cursor(CXTranslationUnit &tu) con
   public:
     static void remove_template_argument_and_namespace(std::string &chunk) {
       size_t pos1, pos2;
-      if((pos1=chunk.find('<'))!=std::string::npos && (pos2=chunk.rfind('>'))!=std::string::npos)
-        chunk=chunk.substr(0, pos1)+chunk.substr(pos2+1);
-      if((pos2=chunk.rfind("::"))!=std::string::npos) {
-        pos1=pos2-1;
-        while(pos1!=std::string::npos && ((chunk[pos1]>='a' && chunk[pos1]<='z') || (chunk[pos1]>='A' && chunk[pos1]<='Z') ||
-                                          (chunk[pos1]>='0' && chunk[pos1]<='9') || chunk[pos1]==':' || chunk[pos1]=='_'))
+      if((pos1 = chunk.find('<')) != std::string::npos && (pos2 = chunk.rfind('>')) != std::string::npos)
+        chunk = chunk.substr(0, pos1) + chunk.substr(pos2 + 1);
+      if((pos2 = chunk.rfind("::")) != std::string::npos) {
+        pos1 = pos2 - 1;
+        while(pos1 != std::string::npos && ((chunk[pos1] >= 'a' && chunk[pos1] <= 'z') || (chunk[pos1] >= 'A' && chunk[pos1] <= 'Z') ||
+                                            (chunk[pos1] >= '0' && chunk[pos1] <= '9') || chunk[pos1] == ':' || chunk[pos1] == '_'))
           --pos1;
-        chunk=chunk.substr(0, pos1+1)+chunk.substr(pos2+2);
+        chunk = chunk.substr(0, pos1 + 1) + chunk.substr(pos2 + 2);
       }
     }
   };
   std::vector<std::string> chunks;
-  for(unsigned i=0;i<clang_getNumCompletionChunks(cx_completion_string);++i) {
+  for(unsigned i = 0; i < clang_getNumCompletionChunks(cx_completion_string); ++i) {
     auto kind = clang_getCompletionChunkKind(cx_completion_string, i);
     if(kind != CXCompletionChunk_Optional && kind != CXCompletionChunk_Informative) {
-      auto chunk=clangmm::to_string(clang_getCompletionChunkText(cx_completion_string, i));
+      auto chunk = clangmm::to_string(clang_getCompletionChunkText(cx_completion_string, i));
       ChunkString::remove_template_argument_and_namespace(chunk);
       chunks.emplace_back(chunk);
     }
   }
-  auto parent=clangmm::to_string(clang_getCompletionParent(cx_completion_string, nullptr));
+  auto parent = clangmm::to_string(clang_getCompletionParent(cx_completion_string, nullptr));
   std::vector<std::string> parent_parts;
   if(!parent.empty()) {
-    size_t pos=0;
-    size_t last_pos=0;
-    while((pos=parent.find("::", pos))!=std::string::npos) {
-      parent_parts.emplace_back(parent.substr(last_pos, pos-last_pos));
-      pos+=2;
-      last_pos=pos;
+    size_t pos = 0;
+    size_t last_pos = 0;
+    while((pos = parent.find("::", pos)) != std::string::npos) {
+      parent_parts.emplace_back(parent.substr(last_pos, pos - last_pos));
+      pos += 2;
+      last_pos = pos;
     }
     parent_parts.emplace_back(parent.substr(last_pos));
   }
-  
+
   VisitorData visitor_data{chunks, parent_parts, clangmm::Cursor()};
-  
+
   clang_visitChildren(clang_getTranslationUnitCursor(tu), [](CXCursor cx_cursor, CXCursor cx_parent, CXClientData cx_data) {
     auto data = static_cast<VisitorData *>(cx_data);
-    
-    bool equal=true;
-    auto cx_tmp_cursor=cx_parent;
-    if(clang_getCursorKind(cx_tmp_cursor)!=CXCursorKind::CXCursor_TranslationUnit) {
-      int c=0;
-      auto it=data->parent_parts.rbegin();
-      for(;it!=data->parent_parts.rend();++it) {
-        auto name=clangmm::to_string(clang_getCursorDisplayName(cx_tmp_cursor));
+
+    bool equal = true;
+    auto cx_tmp_cursor = cx_parent;
+    if(clang_getCursorKind(cx_tmp_cursor) != CXCursorKind::CXCursor_TranslationUnit) {
+      int c = 0;
+      auto it = data->parent_parts.rbegin();
+      for(; it != data->parent_parts.rend(); ++it) {
+        auto name = clangmm::to_string(clang_getCursorDisplayName(cx_tmp_cursor));
         size_t pos;
-        if((pos=name.find('<'))!=std::string::npos)
-          name=name.substr(0, pos);
-        if(name!=*it) {
-          equal=false;
+        if((pos = name.find('<')) != std::string::npos)
+          name = name.substr(0, pos);
+        if(name != *it) {
+          equal = false;
           break;
         }
-        cx_tmp_cursor=clang_getCursorSemanticParent(cx_tmp_cursor);
-        if(clang_getCursorKind(cx_tmp_cursor)==CXCursorKind::CXCursor_TranslationUnit) {
+        cx_tmp_cursor = clang_getCursorSemanticParent(cx_tmp_cursor);
+        if(clang_getCursorKind(cx_tmp_cursor) == CXCursorKind::CXCursor_TranslationUnit) {
           ++it;
           break;
         }
         ++c;
       }
-      if(it!=data->parent_parts.rend())
-        equal=false;
+      if(it != data->parent_parts.rend())
+        equal = false;
     }
     else if(!data->parent_parts.empty())
       return CXChildVisit_Recurse;
-    
+
     if(equal) {
       auto completion_string = clang_getCursorCompletionString(cx_cursor);
-      auto num_completion_chunks=clang_getNumCompletionChunks(completion_string);
-      if(num_completion_chunks>=data->completion_chunks.size()) {
-        bool equal=true;
-        for(unsigned i=0;i<data->completion_chunks.size() && i<num_completion_chunks;++i) {
+      auto num_completion_chunks = clang_getNumCompletionChunks(completion_string);
+      if(num_completion_chunks >= data->completion_chunks.size()) {
+        bool equal = true;
+        for(unsigned i = 0; i < data->completion_chunks.size() && i < num_completion_chunks; ++i) {
           auto kind = clang_getCompletionChunkKind(completion_string, i);
           if(kind != CXCompletionChunk_Optional && kind != CXCompletionChunk_Informative) {
-            auto chunk=clangmm::to_string(clang_getCompletionChunkText(completion_string, i));
+            auto chunk = clangmm::to_string(clang_getCompletionChunkText(completion_string, i));
             ChunkString::remove_template_argument_and_namespace(chunk);
-            if(data->completion_chunks[i]!=chunk) {
-              equal=false;
+            if(data->completion_chunks[i] != chunk) {
+              equal = false;
               break;
             }
           }
         }
         if(equal) {
-          data->found_cursor=cx_cursor;
+          data->found_cursor = cx_cursor;
           return CXChildVisit_Break;
         }
       }
     }
-  
+
     return CXChildVisit_Recurse;
   }, &visitor_data);
-  
+
   return Cursor(visitor_data.found_cursor);
 }

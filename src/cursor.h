@@ -1,11 +1,11 @@
 #ifndef CURSOR_H_
 #define CURSOR_H_
-#include <clang-c/Index.h>
 #include "source_location.h"
 #include "source_range.h"
+#include <clang-c/Index.h>
 #include <string>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 namespace clangmm {
   class Cursor {
@@ -183,12 +183,12 @@ namespace clangmm {
       std::string get_spelling() const;
       Type get_result() const;
       Cursor get_cursor() const;
-      bool operator==(const Cursor::Type& rhs) const;
-      
+      bool operator==(const Cursor::Type &rhs) const;
+
       CXType cx_type;
     };
-    
-    Cursor() { cx_cursor=clang_getNullCursor(); }
+
+    Cursor() { cx_cursor = clang_getNullCursor(); }
     Cursor(const CXCursor &cx_cursor) : cx_cursor(cx_cursor) {}
     Kind get_kind() const;
     std::string get_kind_spelling() const;
@@ -212,19 +212,19 @@ namespace clangmm {
     std::vector<Cursor> get_arguments() const;
     std::vector<Cursor> get_all_overridden_cursors() const;
     operator bool() const;
-    bool operator==(const Cursor& rhs) const;
+    bool operator==(const Cursor &rhs) const;
     unsigned hash() const;
-    
+
     bool is_valid_kind() const;
     std::string get_type_description() const;
     std::string get_brief_comments() const;
-    
+
     friend std::ostream &operator<<(std::ostream &os, const Cursor &cursor) {
       os << cursor.get_source_range() << ' ' << cursor.get_spelling();
       return os;
     }
-    
+
     CXCursor cx_cursor;
   };
-}  // namespace clangmm
-#endif  // CURSOR_H_
+} // namespace clangmm
+#endif // CURSOR_H_

@@ -1,15 +1,15 @@
 #ifndef TRANSLATIONUNIT_H_
 #define TRANSLATIONUNIT_H_
-#include <clang-c/Index.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-#include "index.h"
-#include "diagnostic.h"
-#include "tokens.h"
 #include "code_complete_results.h"
 #include "cursor.h"
+#include "diagnostic.h"
+#include "index.h"
+#include "tokens.h"
+#include <clang-c/Index.h>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace clangmm {
   class TranslationUnit {
@@ -17,21 +17,21 @@ namespace clangmm {
     TranslationUnit(Index &index, const std::string &file_path,
                     const std::vector<std::string> &command_line_args,
                     const std::string &buffer,
-                    int flags=DefaultFlags());
+                    int flags = DefaultFlags());
     TranslationUnit(Index &index, const std::string &file_path,
                     const std::vector<std::string> &command_line_args,
-                    int flags=DefaultFlags());
+                    int flags = DefaultFlags());
     ~TranslationUnit();
-    
-    int reparse(const std::string &buffer, int flags=DefaultFlags());
-    
+
+    int reparse(const std::string &buffer, int flags = DefaultFlags());
+
     static int DefaultFlags();
-    
+
     void parse(Index &index,
                const std::string &file_path,
                const std::vector<std::string> &command_line_args,
                const std::map<std::string, std::string> &buffers,
-               int flags=DefaultFlags());
+               int flags = DefaultFlags());
 
     CodeCompleteResults get_code_completions(const std::string &buffer,
                                              unsigned line_number, unsigned column);
@@ -50,6 +50,5 @@ namespace clangmm {
 
     CXTranslationUnit cx_tu;
   };
-}  // namespace clangmm
-#endif  // TRANSLATIONUNIT_H_
-
+} // namespace clangmm
+#endif // TRANSLATIONUNIT_H_
